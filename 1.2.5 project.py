@@ -6,16 +6,33 @@ Version 1.1.5
 11/03/2026
 '''
 
-#load pygame
-import pygame, sys
+#load pygame - no longer needed as using pyinstaller to package the game
+import pygame
+import sys
 pygame.init()
-#import mixer for music
-import pygame.mixer
-#pygame.mixer.init()
+#pygame.mixer.init() - removed music as need audio forwarding to work
+
 #for random colour/size of the blocks
 import random
 #for timed mode countdown
 import time
+
+#image files in different folders - pathlib lets you use relative paths to access files in different folders
+from pathlib import Path
+project_dir = Path(__file__).parent
+parts_dir = project_dir / "parts"
+blocks_dir = parts_dir / "images" / "blocks"
+buttons_dir = parts_dir / "images" / "buttons"
+
+# finds the path for the file name parametre 
+def find_asset(file_name):
+    for folder in (blocks_dir, buttons_dir, parts_dir): # goes through each file in each folder
+        current_file = folder / file_name # tries to make the path of the file
+        if current_file.is_file() == True: # checks if the file exists, else tries the next file in for loop
+            return current_file
+    raise FileNotFoundError(file_name) # prints a specific file not found error for the file instead of none - removes confusing error message
+
+
 
 global active_blocks, grid_array, single_blocks, score, timer
 grid_array = [[0 for _ in range(8)] for _ in range(8)] # 2D array to represent the grid, 0 for empty, 1 for occupied
@@ -87,7 +104,7 @@ class object_on_screen:
         self.y = y
         self.height = height
         self.width = width
-        self.image = pygame.image.load(object_image)
+        self.image = pygame.image.load(find_asset(object_image))
 
     def x_setter(self, new_x):
         self.x = new_x
@@ -96,7 +113,7 @@ class object_on_screen:
         self.y = new_y
 
     def image_setter(self, new_image):
-        self.image = pygame.image.load(new_image)
+        self.image = pygame.image.load(find_asset(new_image))
 
     def height_setter(self, new_height):
         self.height = new_height
@@ -479,7 +496,7 @@ def increase_score():
     score += 50 * score_multiplyer # calculate score
     # display the new score
     score = str(score)
-    score_font = pygame.font.Font("score_font.otf",75)
+    score_font = pygame.font.Font(find_asset("score_font.otf"), 75)
     score_text = score_font.render(score, True, colourwhite)
     scoreRecttext = score_text.get_rect(center=(screen.get_width()/2, screen.get_height()/6))
     screen.blit(score_text, scoreRecttext)
@@ -574,10 +591,10 @@ def timed_button_clicked():
 def togglesound_button_settings_clicked():
     global music_paused
     if music_paused == True:
-        pygame.mixer.music.unpause()
+        #pygame.mixer.music.unpause()  - removed music as need audio forwarding to work
         music_paused = False
     else:
-        pygame.mixer.music.pause()
+        #pygame.mixer.music.pause()  - removed music as need audio forwarding to work
         music_paused = True
     return
 
@@ -612,7 +629,7 @@ def exit_game_button_settings_clicked():
 
 #main display and background
 screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
-bg_image = pygame.image.load("background_image.jpg")
+bg_image = pygame.image.load(find_asset("background_image.jpg"))
 pygame.display.set_caption("Cube Crush")
 colourwhite = (255, 255, 255)
 
@@ -624,12 +641,12 @@ def scale_bg_image():
 pygame.font.init()
 pygame.font.get_init()
 global logo_font
-logo_font = pygame.font.Font("logo_font.ttf", 75)
+logo_font = pygame.font.Font(find_asset("logo_font.ttf"), 75)
 logo_text = logo_font.render("CUBE CRUSH", True, colourwhite)
 logoRecttext = logo_text.get_rect(center=(screen.get_width()/2, screen.get_height()/5))
 
 global score_text, scoreRecttext
-score_font = pygame.font.Font("score_font.otf",75)
+score_font = pygame.font.Font(find_asset("score_font.otf"), 75)
 score_text = score_font.render(str(score), True, colourwhite)
 scoreRecttext = score_text.get_rect(center=(screen.get_width()/2, screen.get_height()/6))
 
@@ -906,9 +923,10 @@ def draw():
         return
 
 #background music
-pygame.mixer.music.load("background_music.mp3")  # use your music file path
-pygame.mixer.music.set_volume(0.5)  # set volume (0.0 to 1.0)
-pygame.mixer.music.play(-1)  # play the music in a loop
+# - removed music as need audio forwarding to work
+#pygame.mixer.music.load(find_asset("background_music.mp3"))  # use your music file path
+#pygame.mixer.music.set_volume(0.5)  # set volume (0.0 to 1.0)
+#pygame.mixer.music.play(-1)  # play the music in a loop
 music_paused = False
 
 state = "startup_screen"
