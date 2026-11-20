@@ -7,7 +7,7 @@ Version 1.1.5
 '''
 
 #load pygame - no longer needed as using pyinstaller to package the game
-import pygame
+#import pygame
 import sys
 pygame.init()
 #pygame.mixer.init() - removed music as need audio forwarding to work
